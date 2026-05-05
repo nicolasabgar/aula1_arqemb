@@ -28,6 +28,12 @@ void main(void)
     int retred;
 	int retgreen;
 
+    int state = 0;
+    // 0 - Vermelho
+    // 1 - Verde
+    // 2 - Amarelo
+
+
     // Verifica se o device está pronto
     if (!gpio_is_ready_dt(&ledred)) {
         printk("Error: LED RED device %s is not ready\n", ledred.port->name);
@@ -54,23 +60,36 @@ void main(void)
 
     while (1) {
 
-		// Estado Vermelho
-        gpio_pin_set_dt(&ledred, 1);
-		gpio_pin_set_dt(&ledgreen, 0);
+        // Logica de estados para saida
+        if (state == 0) {
+            // Estado Vermelho
+            gpio_pin_set_dt(&ledred, 1);
+            gpio_pin_set_dt(&ledgreen, 0);
 
-        k_msleep(TIME_VERMELHO_MS);
+            k_msleep(TIME_VERMELHO_MS);
 
-		// Estado Verde
-		gpio_pin_set_dt(&ledred, 0);
-		gpio_pin_set_dt(&ledgreen, 1);
+        } else if (state == 1) {
+            // Estado Verde
+            gpio_pin_set_dt(&ledred, 0);
+            gpio_pin_set_dt(&ledgreen, 1);
 
-		k_msleep(TIME_VERDE_MS);
+            k_msleep(TIME_VERDE_MS);
 
-		// Estado Amarelo
-		gpio_pin_set_dt(&ledred, 1);
-		gpio_pin_set_dt(&ledgreen, 1);
+        } else {
+            // Estado Amarelo
+            gpio_pin_set_dt(&ledred, 1);
+            gpio_pin_set_dt(&ledgreen, 1);
 
-		k_msleep(TIME_AMARELO_MS);
+            k_msleep(TIME_AMARELO_MS);
+
+        }
+
+        // Logica de proximo estado
+        if (state == 2) {
+            state = 0;
+        } else {
+            state += 1;
+        }
 
     }
 }
